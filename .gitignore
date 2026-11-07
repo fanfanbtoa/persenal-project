@@ -1,0 +1,5 @@
+*.zip
+.screenshots/
+.trae-html-share-packages/
+Thumbs.db
+.DS_Store
