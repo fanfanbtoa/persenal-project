@@ -1,0 +1,6 @@
+.env
+node_modules/
+backups/
+.edge-*/
+Thumbs.db
+.DS_Store
