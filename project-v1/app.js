@@ -196,7 +196,7 @@
 
   // ---------- Fixed avatar ----------
 
-  const AVATAR_SRC = "avatar.webp";
+  const AVATAR_SRC = "avatar.jpg";
 
   function paintMessageAvatar(element) {
     if (!element) return;
