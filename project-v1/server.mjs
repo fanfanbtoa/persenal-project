@@ -22,6 +22,13 @@ const BASE_URL = (
   "https://api.deepseek.com/v1"
 ).replace(/\/+$/, "");
 const MODEL = process.env.DEEPSEEK_MODEL || process.env.LLM_MODEL || "deepseek-chat";
+const CORS_ORIGINS = (
+  process.env.CORS_ORIGINS ||
+  "https://fanfanbtoa.github.io,http://127.0.0.1:3000,http://localhost:3000"
+)
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
 
 const MAX_BODY_BYTES = 100_000;
 const MAX_HISTORY_MESSAGES = 10;
@@ -136,6 +143,17 @@ function sendJson(res, status, payload) {
     "X-Content-Type-Options": "nosniff",
   });
   res.end(body);
+}
+
+function applyCors(req, res) {
+  const origin = req.headers.origin;
+  if (!origin || !CORS_ORIGINS.includes(origin)) return;
+
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Max-Age", "86400");
 }
 
 async function readJsonBody(req) {
@@ -376,6 +394,15 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
 
   try {
+    if (url.pathname.startsWith("/api/")) {
+      applyCors(req, res);
+      if (req.method === "OPTIONS") {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+    }
+
     if (url.pathname === "/api/status") {
       if (req.method !== "GET") {
         sendJson(res, 405, { error: "Method not allowed" });

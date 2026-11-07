@@ -366,8 +366,9 @@
 
   if (!chatLog || !chatForm || !chatInput || !chatPrompts) return;
 
-  const STATUS_ENDPOINT = "/api/status";
-  const CHAT_ENDPOINT = "/api/chat";
+  const API_BASE = String(window.CHAT_API_BASE || "").replace(/\/+$/, "");
+  const STATUS_ENDPOINT = `${API_BASE}/api/status`;
+  const CHAT_ENDPOINT = `${API_BASE}/api/chat`;
   const LLM_TIMEOUT_MS = 30_000;
   const MAX_HISTORY_MESSAGES = 8;
 
