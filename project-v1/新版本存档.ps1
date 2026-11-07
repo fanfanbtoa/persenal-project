@@ -26,7 +26,7 @@ Remove-Item $zip -Force -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force (Join-Path $folder 'commits') -ErrorAction SilentlyContinue
 $nl = [Environment]::NewLine
 $stat = git show --stat --format='%h|%ad|%s' --date=format:'%Y-%m-%d %H:%M' $hash
-$note = @('# 本次提交说明', '', "- 提交：$hash", "- 时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm')", "- 原始提交信息：$Description", '', '## 本次提交涉及的文件', '', $stat, '', '> 这个文件夹是该提交时 project-v1 的完整代码快照，可直接打开 index.html 查看。') -join $nl
+$note = @('# 本次提交说明', '', "- 提交：$hash", "- 时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm')", "- 原始提交信息：$Description", '', '## 这次改了什么', '', $Description, '', '## 本次提交涉及的文件', '', $stat, '', '> 这个文件夹是该提交时 project-v1 的完整代码快照，可直接打开 index.html 查看。') -join $nl
 Set-Content -Path (Join-Path $folder '说明.md') -Value $note -Encoding UTF8
 $tick = [char]96
 $readmePath = 'project-v1\commits\README.md'
