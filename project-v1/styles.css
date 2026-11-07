@@ -1505,7 +1505,7 @@ svg {
   width: 36px;
   height: 36px;
   place-items: center;
-  border-radius: 11px;
+  border-radius: 50%;
   background: linear-gradient(145deg, #0b4a67, #061e2f);
   color: #eafcff;
   font-size: 14px;
