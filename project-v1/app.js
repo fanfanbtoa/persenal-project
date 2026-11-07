@@ -197,6 +197,7 @@
   // ---------- Local avatar upload ----------
 
   const AVATAR_STORAGE_KEY = "fbt.avatar.v1";
+  const DEFAULT_AVATAR_SRC = "avatar.webp";
   const MAX_AVATAR_BYTES = 8 * 1024 * 1024;
   const avatarInput = document.getElementById("avatarInput");
   const avatarUploadButton = document.getElementById("avatarUploadButton");
@@ -346,10 +347,18 @@
       processAvatarFile(file);
     });
 
+    const applyDefaultAvatar = () => {
+      const probe = new Image();
+      probe.onload = () => applyAvatar(DEFAULT_AVATAR_SRC);
+      probe.src = DEFAULT_AVATAR_SRC;
+    };
+
     const storedAvatar = readStoredAvatar();
     if (storedAvatar) {
       applyAvatar(storedAvatar);
       setHint("");
+    } else {
+      applyDefaultAvatar();
     }
   }
 
