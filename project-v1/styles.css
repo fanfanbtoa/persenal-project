@@ -3410,7 +3410,7 @@ main {
 }
 
 .research-card__summary {
-  margin-top: 13px;
+  margin-top: 7px;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.72;
@@ -3437,6 +3437,48 @@ main {
   line-height: 1.7;
 }
 
+.research-card__eyebrow {
+  display: block;
+  margin-top: 16px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.research-card__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: research-item;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.68;
+}
+
+.research-card__list li {
+  position: relative;
+  padding-left: 1.6em;
+  counter-increment: research-item;
+}
+
+.research-card__list li::before {
+  content: counter(research-item) ".";
+  position: absolute;
+  left: 0;
+  color: rgba(94, 234, 212, 0.9);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.research-card__summary strong,
+.research-card__list strong {
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
 .research-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -3455,58 +3497,101 @@ main {
   letter-spacing: 0.02em;
 }
 
-/* Compact desktop: keep the research section within one viewport */
+/* Compact desktop: larger type, and the research section fills one viewport
+   so the next section does not peek in when the nav jumps here */
 @media (min-width: 981px) {
   #research {
     margin-bottom: 20px;
     padding-top: 12px;
   }
 
-  #research .section-heading h2 {
-    margin-top: 8px;
-    font-size: 36px;
-  }
-
-  #research .section-kicker {
-    font-size: 9px;
-  }
-
-  #research .section-intro {
-    font-size: 12.5px;
-    line-height: 1.65;
+  .section--research {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 8px);
   }
 
   .research-grid {
-    gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 16px;
+  }
+
+  #research .section-heading h2 {
+    margin-top: 8px;
+    font-size: 44px;
+  }
+
+  #research .section-kicker {
+    font-size: 10.5px;
+  }
+
+  #research .section-intro {
+    font-size: 14.5px;
+    line-height: 1.7;
   }
 
   .research-card {
-    padding: 22px;
+    padding: 26px;
+  }
+
+  .research-card .panel-label {
+    font-size: 11px;
+  }
+
+  .research-card .panel-no {
+    font-size: 11.5px;
   }
 
   .research-card__title {
-    margin-top: 12px;
-    font-size: 19px;
+    margin-top: 14px;
+    font-size: 24px;
+  }
+
+  .research-card__meta {
+    margin-top: 8px;
+    font-size: 12.5px;
   }
 
   .research-card__summary {
-    margin-top: 11px;
-    font-size: 12.5px;
-    line-height: 1.68;
+    margin-top: 8px;
+    font-size: 14.5px;
+    line-height: 1.72;
   }
 
   .research-card__contribution {
-    margin-top: 12px;
-    padding-top: 11px;
+    margin-top: 18px;
+    padding-top: 14px;
+  }
+
+  .research-card__contribution > span {
+    font-size: 12.5px;
   }
 
   .research-card__contribution p {
-    font-size: 12px;
-    line-height: 1.65;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .research-card__eyebrow {
+    margin-top: 18px;
+    font-size: 12.5px;
+  }
+
+  .research-card__list {
+    gap: 8px;
+    padding-left: 0;
+    font-size: 14px;
+    line-height: 1.7;
   }
 
   .research-card__tags {
-    padding-top: 13px;
+    padding-top: 16px;
+  }
+
+  .research-card__tags li {
+    padding: 5px 10px;
+    font-size: 12px;
   }
 }
 
