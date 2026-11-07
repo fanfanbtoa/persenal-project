@@ -194,175 +194,25 @@
   const sideNoteText = document.getElementById("sideNoteText");
   const chatSubtitle = document.getElementById("chatSubtitle");
 
-  // ---------- Local avatar upload ----------
+  // ---------- Fixed avatar ----------
 
-  const AVATAR_STORAGE_KEY = "fbt.avatar.v1";
-  const DEFAULT_AVATAR_SRC = "avatar.webp";
-  const MAX_AVATAR_BYTES = 8 * 1024 * 1024;
-  const avatarInput = document.getElementById("avatarInput");
-  const avatarUploadButton = document.getElementById("avatarUploadButton");
-  const avatarHint = document.getElementById("avatarHint");
+  const AVATAR_SRC = "avatar.webp";
 
-  let currentAvatar = null;
-
-  function paintMessageAvatar(element, dataUrl) {
+  function paintMessageAvatar(element) {
     if (!element) return;
     element.textContent = "";
-    element.classList.toggle("msg-avatar--photo", Boolean(dataUrl));
-    if (!dataUrl) {
-      element.textContent = "范";
-      return;
-    }
     const image = document.createElement("img");
     image.className = "msg-avatar__image";
-    image.src = dataUrl;
+    image.src = AVATAR_SRC;
     image.alt = "";
     element.append(image);
   }
 
-  function initAvatarUploader() {
-    if (!avatarInput || !avatarUploadButton || !avatarHint) return;
-
-    const targets = [
-      {
-        image: document.getElementById("heroAvatarImage"),
-        fallback: document.getElementById("heroAvatarFallback"),
-      },
-      {
-        image: document.getElementById("sideAvatarImage"),
-        fallback: document.getElementById("sideAvatarFallback"),
-      },
-    ];
-
-    const setHint = (message) => {
-      avatarHint.textContent = message;
-    };
-
-    const applyAvatar = (dataUrl) => {
-      targets.forEach(({ image, fallback }) => {
-        if (!image) return;
-        if (dataUrl) {
-          image.src = dataUrl;
-          image.hidden = false;
-          if (fallback) fallback.hidden = true;
-        } else {
-          image.hidden = true;
-          image.removeAttribute("src");
-          if (fallback) fallback.hidden = false;
-        }
-      });
-
-      currentAvatar = dataUrl;
-      document.querySelectorAll(".msg-avatar").forEach((avatar) => {
-        paintMessageAvatar(avatar, dataUrl);
-      });
-
-      avatarUploadButton.setAttribute("aria-label", dataUrl ? "更换头像" : "上传头像");
-      avatarUploadButton.title = dataUrl ? "点击更换头像" : "点击上传头像";
-    };
-
-    const readStoredAvatar = () => {
-      try {
-        const value = localStorage.getItem(AVATAR_STORAGE_KEY);
-        return value && value.startsWith("data:image/") ? value : null;
-      } catch {
-        return null;
-      }
-    };
-
-    const persistAvatar = (dataUrl) => {
-      try {
-        localStorage.setItem(AVATAR_STORAGE_KEY, dataUrl);
-        return true;
-      } catch {
-        return false;
-      }
-    };
-
-    const loadImage = (src) =>
-      new Promise((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = () => reject(new Error("image-decode-failed"));
-        image.src = src;
-      });
-
-    const processAvatarFile = async (file) => {
-      if (!file) return;
-
-      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
-        setHint("请选择 JPG / PNG / WebP 图片");
-        return;
-      }
-
-      if (file.size > MAX_AVATAR_BYTES) {
-        setHint("图片请控制在 8MB 以内");
-        return;
-      }
-
-      setHint("正在处理图片…");
-      const objectUrl = URL.createObjectURL(file);
-
-      try {
-        const image = await loadImage(objectUrl);
-        const MAX_DIM = 512;
-        const scale = Math.min(
-          MAX_DIM / image.naturalWidth,
-          MAX_DIM / image.naturalHeight
-        );
-        const outWidth = Math.round(image.naturalWidth * scale);
-        const outHeight = Math.round(image.naturalHeight * scale);
-        if (!outWidth || !outHeight) throw new Error("empty-image");
-
-        const canvas = document.createElement("canvas");
-        canvas.width = outWidth;
-        canvas.height = outHeight;
-        const context = canvas.getContext("2d");
-        if (!context) throw new Error("canvas-unavailable");
-
-        context.drawImage(image, 0, 0, outWidth, outHeight);
-
-        const webp = canvas.toDataURL("image/webp", 0.88);
-        const dataUrl = webp.startsWith("data:image/webp")
-          ? webp
-          : canvas.toDataURL("image/png");
-
-        const persisted = persistAvatar(dataUrl);
-        applyAvatar(dataUrl);
-        setHint(persisted ? "" : "已应用 · 本机未持久保存");
-      } catch {
-        setHint("图片读取失败，请换一张试试");
-      } finally {
-        URL.revokeObjectURL(objectUrl);
-        avatarInput.value = "";
-      }
-    };
-
-    avatarUploadButton.addEventListener("click", () => {
-      avatarInput.click();
-    });
-
-    avatarInput.addEventListener("change", () => {
-      const file = avatarInput.files && avatarInput.files[0];
-      processAvatarFile(file);
-    });
-
-    const applyDefaultAvatar = () => {
-      const probe = new Image();
-      probe.onload = () => applyAvatar(DEFAULT_AVATAR_SRC);
-      probe.src = DEFAULT_AVATAR_SRC;
-    };
-
-    const storedAvatar = readStoredAvatar();
-    if (storedAvatar) {
-      applyAvatar(storedAvatar);
-      setHint("");
-    } else {
-      applyDefaultAvatar();
-    }
+  function initFixedAvatar() {
+    document.querySelectorAll(".msg-avatar").forEach(paintMessageAvatar);
   }
 
-  initAvatarUploader();
+  initFixedAvatar();
 
   if (!chatLog || !chatForm || !chatInput || !chatPrompts) return;
 
@@ -397,7 +247,7 @@
     const avatar = document.createElement("span");
     avatar.className = "msg-avatar";
     avatar.setAttribute("aria-hidden", "true");
-    paintMessageAvatar(avatar, currentAvatar);
+    paintMessageAvatar(avatar);
     return avatar;
   }
 

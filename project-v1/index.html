@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#03171a">
   <title>范博韬｜自动化 × AI × 控制</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20261108b">
+  <link rel="stylesheet" href="styles.css?v=20261108c">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
 </head>
 <body>
@@ -48,22 +48,11 @@
 
       <div class="hero-identity">
         <div class="hero-avatar">
-          <input type="file" id="avatarInput" accept="image/png,image/jpeg,image/webp" hidden>
-          <button
-            class="avatar-upload"
-            id="avatarUploadButton"
-            type="button"
-            aria-label="上传头像"
-            aria-describedby="avatarHint"
-            title="点击上传头像"
-          >
-            <span class="avatar-upload__frame" id="heroAvatarFrame">
-              <span class="avatar-upload__fallback" id="heroAvatarFallback">范</span>
-              <img class="avatar-upload__image" id="heroAvatarImage" alt="" hidden>
+          <div class="avatar-upload">
+            <span class="avatar-upload__frame">
+              <span class="avatar-upload__fallback" hidden>范</span>
+              <img class="avatar-upload__image" src="avatar.webp" alt="">
             </span>
-          </button>
-          <div class="avatar-upload__meta">
-            <span class="avatar-upload__hint" id="avatarHint" aria-live="polite">点击上传</span>
           </div>
         </div>
 
@@ -341,8 +330,8 @@
           <aside class="twin-side" aria-label="数字分身介绍">
             <div class="side-orbit" aria-hidden="true"></div>
             <div class="side-avatar" role="img" aria-label="范博韬的数字分身">
-              <span id="sideAvatarFallback">范</span>
-              <img class="side-avatar-photo" id="sideAvatarImage" alt="" hidden>
+              <span id="sideAvatarFallback" hidden>范</span>
+              <img class="side-avatar-photo" src="avatar.webp" alt="">
             </div>
             <p class="micro-label side-label">DIGITAL TWIN / 01</p>
             <h3>范博韬的数字分身</h3>
@@ -419,6 +408,6 @@
   </footer>
 
   <script src="config.js"></script>
-  <script src="app.js?v=20261108a"></script>
+  <script src="app.js?v=20261108b"></script>
 </body>
 </html>

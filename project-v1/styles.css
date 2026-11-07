@@ -407,17 +407,6 @@ svg {
   border-radius: 50%;
   background: transparent;
   box-shadow: 0 14px 26px -22px rgba(6, 30, 47, 0.75);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.avatar-upload:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 36px -22px rgba(14, 116, 144, 0.9);
-}
-
-.avatar-upload:active {
-  transform: translateY(0) scale(0.98);
 }
 
 .avatar-upload__frame {
