@@ -3308,14 +3308,11 @@ main {
 /* Photo avatars keep a clean circular edge with no decorative ring */
 .msg-avatar--photo {
   background: #ffffff;
+  border: 0;
   box-shadow: none;
 }
 
 /* Keep the whole portrait (head + shoulders) inside the circular frame */
-.msg-avatar--photo .msg-avatar__image {
-  object-fit: contain;
-  object-position: center;
-}
 
 
 /* Hero contact row (phone + email) */
@@ -3347,4 +3344,21 @@ main {
 .hero-facts__contact a:hover {
   color: #ffffff;
   border-bottom-color: currentColor;
+}
+
+
+/* Keep the chat panel a fixed height; long answers scroll inside instead of growing the box */
+.chat-log {
+  height: 340px;
+  min-height: 340px;
+  max-height: 340px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .chat-log {
+    height: 300px;
+    min-height: 300px;
+    max-height: 300px;
+  }
 }
