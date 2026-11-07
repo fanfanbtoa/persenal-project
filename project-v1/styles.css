@@ -3365,3 +3365,167 @@ main {
     max-height: 300px;
   }
 }
+
+/* ---------- Research & projects ---------- */
+.research-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 14px;
+}
+
+.research-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 24px;
+}
+
+.research-card .panel-label {
+  font-size: 9.5px;
+}
+
+.research-card .panel-no {
+  font-size: 10px;
+}
+
+.research-card__title {
+  position: relative;
+  z-index: 1;
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 680;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.research-card__meta {
+  margin-top: 6px;
+  color: var(--indigo);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.research-card__summary {
+  margin-top: 13px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+.research-card__contribution {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+}
+
+.research-card__contribution > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.research-card__contribution p {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.research-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.research-card__tags li {
+  padding: 4px 9px;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 999px;
+  background: rgba(94, 234, 212, 0.07);
+  color: var(--ink-soft);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+/* Compact desktop: keep the research section within one viewport */
+@media (min-width: 981px) {
+  #research {
+    margin-bottom: 20px;
+    padding-top: 12px;
+  }
+
+  #research .section-heading h2 {
+    margin-top: 8px;
+    font-size: 36px;
+  }
+
+  #research .section-kicker {
+    font-size: 9px;
+  }
+
+  #research .section-intro {
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+
+  .research-grid {
+    gap: 12px;
+  }
+
+  .research-card {
+    padding: 22px;
+  }
+
+  .research-card__title {
+    margin-top: 12px;
+    font-size: 19px;
+  }
+
+  .research-card__summary {
+    margin-top: 11px;
+    font-size: 12.5px;
+    line-height: 1.68;
+  }
+
+  .research-card__contribution {
+    margin-top: 12px;
+    padding-top: 11px;
+  }
+
+  .research-card__contribution p {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .research-card__tags {
+    padding-top: 13px;
+  }
+}
+
+@media (max-width: 980px) {
+  .research-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  #research {
+    padding-top: 0;
+  }
+
+  .research-card {
+    padding: 22px;
+  }
+
+  .research-card__title {
+    font-size: 19px;
+  }
+}

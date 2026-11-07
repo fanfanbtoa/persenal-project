@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#03171a">
   <title>范博韬｜自动化 × AI × 控制</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20261107j">
+  <link rel="stylesheet" href="styles.css?v=20261108b">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
 </head>
 <body>
@@ -25,6 +25,7 @@
 
       <nav class="main-nav" aria-label="主导航">
         <a href="#intro"><span class="nav-full">个人简介</span><span class="nav-short">简介</span></a>
+        <a href="#research"><span class="nav-full">科研项目经历</span><span class="nav-short">科研经历</span></a>
         <a href="#about"><span class="nav-full">专业能力与发展方向</span><span class="nav-short">能力与发展方向</span></a>
         <a href="#twin"><span class="nav-full">数字分身</span><span class="nav-short">数字分身</span></a>
       </nav>
@@ -109,11 +110,75 @@
 
     </section>
 
+    <!-- Research & projects -->
+    <section class="section section--research container" aria-labelledby="research-title">
+      <header class="section-head reveal" id="research">
+        <div class="section-heading">
+          <p class="section-kicker"><span>02</span> RESEARCH &amp; PROJECTS</p>
+          <h2 id="research-title">科研项目经历</h2>
+        </div>
+        <p class="section-intro">从波浪航行器到 Q-Learning 路径规划：把控制、建模与算法落到可复现的项目里。</p>
+      </header>
+
+      <div class="research-grid">
+        <article class="panel research-card reveal">
+          <div class="panel-top">
+            <span class="panel-label">01 / 国家级创新项目</span>
+            <span class="panel-no" aria-hidden="true">2024.07–2025.07</span>
+          </div>
+          <h3 class="research-card__title">长航时波浪航行器设计与制造</h3>
+          <p class="research-card__meta">核心成员 · “海洋探险者”</p>
+          <p class="research-card__summary">面向长航时波浪航行器，研究双功能水翼的推进效率与能量捕获规律；并设计集成陶瓷轴承与弹性限位件的转轴固定装置，提升复杂海况下的耐久性。</p>
+          <div class="research-card__contribution">
+            <span>本人贡献</span>
+            <p>负责舱体三维建模与数值模拟：用 SolidWorks 完成舱体建模，基于 STAR-CCM+ 二维非定常 CFD 模型研究设计参数对水动力性能的影响，处理仿真数据并对比不同构型。</p>
+          </div>
+          <ul class="research-card__tags">
+            <li>SolidWorks</li><li>STAR-CCM+</li><li>CFD</li><li>水动力</li>
+          </ul>
+        </article>
+
+        <article class="panel research-card reveal">
+          <div class="panel-top">
+            <span class="panel-label">02 / 国家发明专利</span>
+            <span class="panel-no" aria-hidden="true">2025.04–2025.11</span>
+          </div>
+          <h3 class="research-card__title">水翼转轴固定装置</h3>
+          <p class="research-card__meta">第三发明人 · 波浪推进海洋航行器</p>
+          <p class="research-card__summary">针对水下牵引机转轴磨损严重、寿命短的问题，提出陶瓷轴承与特殊结构轴承盖套、弹性水翼限位杆与滑动轨道配合的新型固定装置，降低摩擦并吸收冲击载荷。</p>
+          <div class="research-card__contribution">
+            <span>本人贡献</span>
+            <p>负责海洋航行器舱体的 SolidWorks 三维建模，主导构建包含总体视图、剖视图与爆炸图的工程图，完成零部件序号标注，并参与部分专利说明书撰写。</p>
+          </div>
+          <ul class="research-card__tags">
+            <li>国家发明专利</li><li>陶瓷轴承</li><li>结构设计</li><li>工程图</li>
+          </ul>
+        </article>
+
+        <article class="panel research-card reveal">
+          <div class="panel-top">
+            <span class="panel-label">03 / 论文</span>
+            <span class="panel-no" aria-hidden="true">2026.01–至今</span>
+          </div>
+          <h3 class="research-card__title">Q-Learning 路径规划</h3>
+          <p class="research-card__meta">第一作者 · ICMLM 2026 录用</p>
+          <p class="research-card__summary">面向未知环境下的移动机器人路径规划，构建基于马尔可夫决策过程的 Q-learning 模型，研究 ε-greedy 衰减策略与学习率对收敛性的影响，实现无先验地图下的无碰撞路径求解。</p>
+          <div class="research-card__contribution">
+            <span>本人贡献</span>
+            <p>作为第一作者，负责论文整体思路与实验方案设计，参与二维栅格环境下 Q-learning 路径规划模型构建，完成不同 ε 衰减策略与学习率参数的对比实验及论文撰写。</p>
+          </div>
+          <ul class="research-card__tags">
+            <li>Q-learning</li><li>MDP</li><li>路径规划</li><li>论文</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
     <!-- Capabilities & exploration -->
     <section class="section section--capabilities container" aria-labelledby="about-title">
       <header class="section-head reveal" id="about">
         <div class="section-heading">
-          <p class="section-kicker"><span>02</span> CAPABILITIES &amp; DIRECTIONS</p>
+          <p class="section-kicker"><span>03</span> CAPABILITIES &amp; DIRECTIONS</p>
           <h2 id="about-title">专业能力与发展方向</h2>
         </div>
         <p class="section-intro">自动化给了我系统性的工程视角；现在，我在 AI 与控制算法的交叉处继续深入。</p>
@@ -251,7 +316,7 @@
       <div class="container">
         <header class="section-head reveal" id="twin">
           <div class="section-heading">
-            <p class="section-kicker"><span>03</span> DIGITAL TWIN</p>
+            <p class="section-kicker"><span>04</span> DIGITAL TWIN</p>
             <h2 id="twin-title">和我的数字分身聊聊</h2>
           </div>
           <p class="section-intro">不用先约时间。关于我的背景、能力与发展方向，可以先问它。</p>
