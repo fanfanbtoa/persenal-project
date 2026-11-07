@@ -1510,6 +1510,8 @@ svg {
   color: #eafcff;
   font-size: 14px;
   font-weight: 600;
+  object-fit: cover;
+  object-position: center 22%;
 }
 
 .footer-id strong {
