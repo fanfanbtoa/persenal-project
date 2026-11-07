@@ -3316,3 +3316,35 @@ main {
   object-fit: contain;
   object-position: center;
 }
+
+
+/* Hero contact row (phone + email) */
+.hero-facts__contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  grid-column: 1 / -1;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.hero-facts__contact dt:not(:first-child) {
+  margin-left: 18px;
+}
+
+.hero-facts__contact dd {
+  margin-top: 0;
+}
+
+.hero-facts__contact a {
+  color: var(--cream);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(242, 230, 201, 0.35);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.hero-facts__contact a:hover {
+  color: #ffffff;
+  border-bottom-color: currentColor;
+}
