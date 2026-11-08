@@ -37,6 +37,7 @@ $readme = $readme -replace '(?m)- 当前最新提交：' + $tick + '[^' + $tick 
 Set-Content -Path $readmePath -Value $readme -Encoding UTF8
 git add project-v1/commits
 git commit -m "添加 $hash $Description 快照"
-git push e main
-git push origin main
+Write-Output ''
+Write-Output "本地存档完成：$folder"
+Write-Output '本次未推送到 E 盘 / GitHub；需要同步时再运行 同步.bat，或直接让我同步。'
 Write-Host "完成：$folder"
