@@ -24,6 +24,7 @@ git archive --format=zip --output=$zip $ref
 Expand-Archive -Path $zip -DestinationPath $folder -Force
 Remove-Item $zip -Force -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force (Join-Path $folder 'commits') -ErrorAction SilentlyContinue
+Remove-Item -Force (Join-Path $folder 'bg.mp4') -ErrorAction SilentlyContinue
 $nl = [Environment]::NewLine
 $stat = git show --stat --format='%h|%ad|%s' --date=format:'%Y-%m-%d %H:%M' $hash
 $note = @('# 本次提交说明', '', "- 提交：$hash", "- 时间：$(Get-Date -Format 'yyyy-MM-dd HH:mm')", "- 原始提交信息：$Description", '', '## 这次改了什么', '', $Description, '', '## 本次提交涉及的文件', '', $stat, '', '> 这个文件夹是该提交时 project-v1 的完整代码快照，可直接打开 index.html 查看。') -join $nl
