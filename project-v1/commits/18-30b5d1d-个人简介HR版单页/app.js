@@ -1,0 +1,808 @@
+/* =========================================================
+   范博韬 · Personal Page
+   Digital twin — first-version local knowledge base
+   ========================================================= */
+
+(() => {
+  "use strict";
+
+  const GREETING =
+    "你好，我是范博韬的数字分身。\n\n" +
+    "想快速了解他的专业背景、能力积累、保研去向或未来方向？直接问我，或从下面的问题开始。";
+
+  const INITIAL_PROMPTS = [
+    "用几句话介绍一下你自己",
+    "科研项目都做了什么？",
+    "保研去了哪里？",
+    "现在在学什么？",
+  ];
+
+  const FOLLOW_UPS = {
+    english: ["成绩排名怎么样？", "科研项目做了什么？", "保研去了哪里？"],
+    courses: ["成绩排名怎么样？", "科研项目做了什么？", "现在在学什么？"],
+    gpa: ["科研项目做了什么？", "保研去了哪里？", "你的优势是什么？"],
+    honors: ["竞赛经历有哪些？", "科研项目做了什么？", "保研去了哪里？"],
+    competition: ["科研项目做了什么？", "论文和专利呢？", "你在团队里做什么？"],
+    patent: ["波浪航行器项目做了什么？", "论文呢？", "竞赛经历有哪些？"],
+    paper: ["Q-learning 具体怎么做？", "科研项目做了什么？", "保研去了哪里？"],
+    research: ["波浪航行器项目做了什么？", "论文和专利呢？", "竞赛经历有哪些？"],
+    research_wave: ["专利呢？", "论文呢？", "竞赛经历有哪些？"],
+    research_qlearning: ["论文呢？", "科研项目做了什么？", "现在在学什么？"],
+    internship: ["科研项目做了什么？", "保研去了哪里？", "联系方式？"],
+    politics: ["成绩排名怎么样？", "保研去了哪里？", "你的优势是什么？"],
+    direction: ["保研去了哪里？", "现在在学什么？", "科研项目做了什么？"],
+    interests: ["你的性格怎么样？", "现在在学什么？", "保研去了哪里？"],
+    zju: ["未来想做什么方向？", "现在在学什么？", "科研项目做了什么？"],
+    current: ["未来想做什么方向？", "保研去了哪里？", "科研项目做了什么？"],
+    skills: ["科研项目做了什么？", "竞赛经历有哪些？", "保研去了哪里？"],
+    programming: ["科研项目做了什么？", "论文呢？", "你的优势是什么？"],
+    major: ["成绩排名怎么样？", "保研去了哪里？", "科研项目做了什么？"],
+    trait: ["你在团队里做什么？", "科研项目做了什么？", "未来想做什么方向？"],
+    teamwork: ["竞赛经历有哪些？", "科研项目做了什么？", "你的优势是什么？"],
+    profile: ["科研项目做了什么？", "保研去了哪里？", "你的优势是什么？"],
+    contact: ["科研项目做了什么？", "保研去了哪里？", "用几句话介绍你自己"],
+    intro: ["科研项目做了什么？", "保研去了哪里？", "现在在学什么？"],
+    can_ask: ["科研项目做了什么？", "保研去了哪里？", "你的优势是什么？"],
+    private: ["科研项目做了什么？", "保研去了哪里？", "联系方式？"],
+    advisor: ["保研去了哪里？", "未来想做什么方向？", "现在在学什么？"],
+    study_plan: ["未来想做什么方向？", "保研去了哪里？", "现在在学什么？"],
+    fallback: ["用几句话介绍你自己", "科研项目做了什么？", "保研去了哪里？"],
+  };
+
+  const PROFILE_SUMMARY =
+    "我是范博韬，哈尔滨工程大学（211、双一流）智能科学与工程学院自动化专业 2023 级本科生，2027.06 毕业，目前已保研至浙江大学电子信息专业。\n\n" +
+    "本科加权平均分 92.2，专业排名 13/167（前 8%）；拿过国家励志奖学金、黑龙江省三好学生、比亚迪奖学金、固德威奖学金、校一等奖学金（两次）、校二等奖学金和校级优秀共青团干部；CET-4 528、CET-6 513。\n\n" +
+    "科研上，我是国家级创新项目“海洋探险者”长航时波浪航行器的核心成员，负责 SolidWorks 建模和 STAR-CCM+ 的 CFD 仿真；也是国家发明专利《波浪推进海洋航行器水翼转轴固定装置》的第三发明人；还有一篇第一作者论文《Application and Parameter Optimization of Q-Learning Algorithm in Path Planning》，已被 ICMLM 2026 录用。\n\n" +
+    "竞赛方面，拿过美赛特等奖提名 F 奖（前 2%）和全国大学生数学建模竞赛黑龙江省一等奖（前 10%）。\n\n" +
+    "我关注控制算法、具身智能和 AI Agent，想做的事情是把控制论的系统性和 AI 的学习、决策能力结合起来，在真实环境里完成感知、决策和行动的闭环。\n\n" +
+    "联系方式：手机 17313048569，邮箱 botao_fan@163.com。";
+
+  const KB = [
+    {
+      id: "english",
+      test: /(英语|英文|外语|CET|四级|六级|四六级|托福|雅思)/i,
+      answer:
+        "CET-4 528、CET-6 513，读写都够用。\n\n" +
+        "平时会看英文文献，竞赛和论文里也做过中英文撰写与翻译。口语不算强项，但日常交流和文献阅读没问题。",
+    },
+    {
+      id: "courses",
+      test: /(课程|专业课|哪门课|分数最高|成绩单|学过什么课)/,
+      answer:
+        "本科比较有代表性的课程和分数是：线性代数 98、嵌入式控制系统 98、概率论与数理统计 97、自动控制系统设计实践 95、现代控制理论 95、电力电子技术 94、电路基础 94、自动控制理论 93、电子技术 A 92。\n\n" +
+        "整体加权平均分 92.2，专业排名 13/167。",
+    },
+    {
+      id: "gpa",
+      test: /(绩点|GPA|加权|平均分|排名|成绩|分数|学业)/i,
+      answer:
+        "加权平均分 92.2，专业排名 13/167，大概前 8%。\n\n" +
+        "我自己比较看重的是把基础课学扎实，比如线性代数 98、现代控制理论 95、自动控制理论 93，这些对后面做控制和 AI 都有帮助。",
+    },
+    {
+      id: "honors",
+      test: /(奖学金|荣誉|奖项|奖励|表彰|获奖|三好|优秀|国家励志|固德威|比亚迪|共青团)/,
+      answer:
+        "本科拿过国家励志奖学金、黑龙江省三好学生、比亚迪奖学金、固德威奖学金、校一等奖学金（两次）、校二等奖学金，还有校级优秀共青团干部。\n\n" +
+        "竞赛上还有美赛特等奖提名 F 奖（前 2%）和全国大学生数学建模竞赛黑龙江省一等奖（前 10%）。这些更多是对过去阶段的一个记录，我比较在意的是后面还能不能持续做出东西。",
+    },
+    {
+      id: "competition",
+      test: /(竞赛|比赛|赛事|美赛|数学建模|数模|国赛|F\s*奖|特等奖|省一|一等奖|建模比赛)/,
+      answer:
+        "比较有代表性的有两项。\n\n" +
+        "一个是美国大学生数学建模竞赛，特等奖提名 F 奖（前 2%），第一作者，2025.01。题目是森林转农业用地的生态演变，我们建了一个包含三营养级的季节性循环生态动力学模型，结合 Beverton-Holt 和 Logistic 增长模型，分析化学制剂对生态稳定性的扰动，再用层次分析法评估有机农业指标。\n\n" +
+        "另一个是全国大学生数学建模竞赛，黑龙江省一等奖（前 10%），第二作者，2024.09。做的是生产过程多阶段决策，用多目标优化和遗传算法，融合蒙特卡洛模拟与贝叶斯更新，解决次品率不确定下的抽样检测和拆解策略。\n\n" +
+        "两次我都主要担任论文手，负责撰写、翻译、可视化和团队成果整合。",
+    },
+    {
+      id: "patent",
+      test: /(专利|发明|转轴|固定装置|陶瓷轴承|发明人)/,
+      answer:
+        "我参与了一项国家发明专利《波浪推进海洋航行器水翼转轴固定装置》，是第三发明人，2025.04–2025.11。\n\n" +
+        "它针对水下牵引机转轴磨损严重、寿命短的问题，引入陶瓷轴承和特殊结构轴承盖套来降低摩擦系数，再设计弹性水翼限位杆与滑动轨道配合，吸收冲击载荷，提升复杂海洋环境下的耐腐蚀性和使用寿命。\n\n" +
+        "我主要负责舱体的 SolidWorks 三维建模，主导总体视图、剖视图和爆炸图，完成零部件序号标注，并参与部分专利说明书撰写。",
+    },
+    {
+      id: "paper",
+      test: /(论文|文章|学术|ICMLM|Q[- ]?learning|路径规划|强化学习|第一作者|一作|发表|录用)/i,
+      answer:
+        "我有一篇第一作者论文《Application and Parameter Optimization of Q-Learning Algorithm in Path Planning》，已被 ICMLM 2026 录用，2026.01 至今。\n\n" +
+        "研究的是未知环境下的移动机器人路径规划：用马尔可夫决策过程（MDP）建 Q-learning 模型，重点看 ε-greedy 策略的衰减机制和学习率 α 对收敛性的影响，在二维栅格环境里做多场景仿真，实现在没有先验地图时的无碰撞路径求解。\n\n" +
+        "我负责整体研究思路、实验方案、不同 ε 衰减策略和学习率的对比实验，以及论文撰写和修改。",
+    },
+    {
+      id: "research_wave",
+      test: /(波浪|航行器|水翼|舱体|CFD|STAR-CCM|海洋探险者)/i,
+      answer:
+        "“海洋探险者”长航时波浪航行器是我投入比较多的一个项目，国家级创新项目，2024.07–2025.07，我是核心成员。\n\n" +
+        "项目一方面基于双功能波浪航行器的理论和仿真模型，调整参数研究水翼推进效率与能量捕获效率；另一方面设计集成陶瓷轴承和弹性限位件的转轴固定装置，提升复杂海况下的耐久性。\n\n" +
+        "我主要负责舱体三维建模和数值模拟：用 SolidWorks 建模，基于 STAR-CCM+ 的二维非定常 CFD 模型，系统研究设计参数对水动力性能的影响，处理仿真数据、生成可视化图表，并对比不同构型。",
+    },
+    {
+      id: "research_qlearning",
+      test: /(Q[- ]?learning|路径规划|强化学习|MDP|ε|epsilon|学习率)/i,
+      answer:
+        "Q-learning 路径规划是我第一作者论文的方向，ICMLM 2026 录用，2026.01 至今。\n\n" +
+        "具体做法是用马尔可夫决策过程建模，在二维栅格环境里构建 Q-learning 路径规划模型，重点研究 ε-greedy 策略的衰减机制和学习率 α 对收敛性的影响，通过多场景仿真对比不同参数下的累积奖励和路径质量，最终实现无先验地图下的无碰撞路径求解。\n\n" +
+        "我负责研究思路、实验方案、参数对比实验和论文撰写。",
+    },
+    {
+      id: "research",
+      test: /(科研|项目|课题|实验|航行器|波浪|CFD|仿真|SolidWorks|STAR-CCM|舱体|水翼|三维建模)/i,
+      answer:
+        "本科的科研主要围绕长航时波浪航行器和强化学习路径规划。\n\n" +
+        "在国家级创新项目“海洋探险者”长航时波浪航行器设计与制造里，我是核心成员（2024.07–2025.07），负责舱体三维建模和数值模拟：用 SolidWorks 建模，基于 STAR-CCM+ 建立二维非定常 CFD 模型，研究设计参数对水动力性能、推进效率和能量捕获的影响，处理仿真数据并做可视化对比。\n\n" +
+        "另外还有一项国家发明专利（第三发明人）和一篇第一作者论文（ICMLM 2026 录用）。整体上我比较喜欢把一个问题从建模、仿真做到可验证的结果。",
+    },
+    {
+      id: "internship",
+      test: /(实习|工作经历|工作经验|职场|internship)/i,
+      answer:
+        "这份保研简历里没有单独列实习经历，我目前的经历主要是科研项目、论文专利和竞赛。\n\n" +
+        "之后我会整理一份实习简历，如果有合适的岗位也欢迎联系我；现在可以先聊教育背景、科研项目、论文专利和竞赛这些。",
+    },
+    {
+      id: "politics",
+      test: /(党员|政治面貌|政治|入党)/,
+      answer: "我是中共党员。",
+    },
+    {
+      id: "direction",
+      test: /(未来|职业|就业|工作方向|工作规划|想工作|想从事|想做什么|发展规划|规划|方向|目标|长期|深造|读研后|毕业以后|以后想)/,
+      answer:
+        "我想做的方向是 AI Agent、具身智能和控制算法的交叉。\n\n" +
+        "具体一点，是把控制论里的系统性、稳定性和 AI 的学习、决策能力结合起来，让智能体在真实环境里完成感知、决策和行动的闭环。现阶段会继续补算法和工程能力，也希望在真实项目里验证自己的理解。",
+    },
+    {
+      id: "interests",
+      test: /(兴趣|爱好|健身|旅行|业余|空闲|平时.*(喜欢|做)|放松)/,
+      answer:
+        "平时喜欢健身和旅行。\n\n" +
+        "健身让我保持稳定的节奏和长期投入的习惯，旅行让我换个视角看问题。两件事都在提醒我：认准一个目标，就认真投入、全力以赴。",
+    },
+    {
+      id: "study_plan",
+      test: /(研究生|读研|研一|研究生阶段|计划|打算|怎么安排|未来三年)/,
+      answer:
+        "研究生阶段我还没有把计划定得很死，但大方向是先把基础打扎实，再尽快进项目。\n\n" +
+        "具体会围绕 AI Agent、具身智能和控制算法补课，争取尽早参与真实课题，把感知、决策、行动的闭环跑通。也会继续做论文和工程实现，不希望只停留在仿真里。",
+    },
+    {
+      id: "zju",
+      test: /(保研|浙江大学|浙大|电子信息|研究生|录取|去向|为什么.*浙大|为什么.*保研)/,
+      answer:
+        "我目前保研到浙江大学电子信息专业，本科是哈尔滨工程大学自动化。\n\n" +
+        "选择这个方向，主要是想在电子信息与智能系统的语境里继续做 AI Agent、具身智能和控制算法，和本科的控制背景能接上。接下来会先把研究生阶段的基础和项目打扎实。",
+    },
+    {
+      id: "current",
+      test: /(现在|目前|最近|正在|在做|在学|忙什么|agent|智能体|具身|学习什么|学什么)/i,
+      answer:
+        "最近主要在系统学习 AI Agent，同时持续关注具身智能和控制算法。\n\n" +
+        "也会通过完成已有项目来加深理解，不只停在概念层，尽量把每个知识点落到可运行、可复现的结果上。",
+    },
+    {
+      id: "skills",
+      test: /(能力|知识|学到|学了什么|核心|技能|工具|软件|擅长|基础|积累|掌握|会什么|会哪些|本科.*学)/,
+      answer:
+        "本科阶段我主要积累了三层能力：\n\n" +
+        "一是系统与控制思维，理解一个系统怎么建模、分析和调节；二是工程实现意识，把算法和想法落成能跑的项目；三是持续学习能力，面对新方向能快速搭框架、补基础、做验证。\n\n" +
+        "工具上常用 SolidWorks、STAR-CCM+ 和 CFD 数值模拟；方法上做过 Q-learning、MDP、强化学习、多目标优化、遗传算法、蒙特卡洛模拟、贝叶斯更新和层次分析法；也具备数学建模、中英文论文写作、数据可视化和专利说明书撰写的经验。",
+    },
+    {
+      id: "programming",
+      test: /(编程|代码|python|c\+\+|java|matlab|语言|写代码|开发)/i,
+      answer:
+        "简历里没有单独列编程语言和熟练度，我不想在这里夸大。\n\n" +
+        "实际项目里我用过 MATLAB 做建模和仿真、用 Python 做 Q-learning 实验和数据处理，也用 SolidWorks、STAR-CCM+ 做建模和 CFD。如果你关心某个具体工具，可以直接问我，我会按真实情况回答。",
+    },
+    {
+      id: "major",
+      test: /(专业|自动化|本科|学历|学校|学院|大几|年级|什么阶段)/,
+      answer:
+        "我本科在哈尔滨工程大学智能科学与工程学院读自动化，2023.09–2027.06，目前大四。\n\n" +
+        "现在已经保研到浙江大学电子信息专业。自动化给了我控制、系统和工程实现的基础，接下来会在电子信息与智能系统的语境里继续深入 AI Agent、具身智能和控制算法。",
+    },
+    {
+      id: "trait",
+      test: /(特点|性格|特质|优势|风格|全力以赴|记忆点|怎么形容|不一样|优点|缺点|短板)/,
+      answer:
+        "如果用一个词形容自己，是“全力以赴”。\n\n" +
+        "面对新方向或项目，我习惯先把目标拆清楚，再持续投入，直到做出可以验证的结果。缺点是有时候会太想把事情做完整，节奏偏慢；现在会有意识地先做最小可验证版本，再迭代。",
+    },
+    {
+      id: "teamwork",
+      test: /(团队|合作|协作|队友|论文手|分工|沟通)/,
+      answer:
+        "团队合作里我比较常做“论文手”和整合的角色。\n\n" +
+        "数学建模竞赛里，我负责中文撰写、英文翻译、部分数据可视化和文献搜集，把建模手和代码手的成果整合成一篇逻辑完整的论文；科研项目里则更多负责建模、仿真和工程图，和队友对齐数据和结论。我的习惯是先把分工和交付标准说清楚，再按节点推进。",
+    },
+    {
+      id: "profile",
+      test: /(基本信息|基本资料|个人资料|个人信息|个人情况|基本情况|概况|简介|档案|资料|信息|简历|关于他|关于你|他是谁|他的情况|你的情况|了解(他|你|一下)|介绍一下|自我介绍)/,
+      answer: PROFILE_SUMMARY,
+    },
+    {
+      id: "contact",
+      test: /(联系|邮箱|微信|电话|手机|怎么找|简历|resume|contact)/i,
+      answer:
+        "可以通过手机 17313048569 或邮箱 botao_fan@163.com 联系我。\n\n" +
+        "简历文件目前没有挂在网页上；需要完整简历可以发邮件索取，我也可以先在这里回答教育背景、成绩排名、科研项目、论文专利和竞赛经历。",
+    },
+    {
+      id: "intro",
+      test: /(你是谁|叫什么|名字|介绍|自我|数字分身|范博韬|本人|主页|背景)/,
+      answer:
+        "你好，我是范博韬的数字分身。\n\n" +
+        PROFILE_SUMMARY +
+        "\n\n你可以继续问教育背景、成绩排名、科研项目、论文专利、竞赛经历、技能工具或保研去向。",
+    },
+    {
+      id: "can_ask",
+      test: /(能问什么|可以问什么|会什么|能做什么|怎么用|有什么问题|问哪些|能聊什么)/,
+      answer:
+        "你可以问我这些：\n\n" +
+        "• 教育背景：学校、专业、成绩排名、课程、英语、党员；\n" +
+        "• 科研项目：波浪航行器、CFD 仿真、专利、Q-learning 论文；\n" +
+        "• 竞赛：美赛、国赛、我在团队里做了什么；\n" +
+        "• 方向与规划：保研去向、想做的方向、现在在学什么；\n" +
+        "• 联系方式，或者让我用几句话概括一下自己。\n\n" +
+        "直接问就行，不用很正式。",
+    },
+    {
+      id: "private",
+      test: /(薪资|工资|offer|几个offer|家庭|父母|女朋友|男朋友|隐私|身份证|住址|宿舍|年龄|生日|高考|籍贯|家乡)/,
+      answer:
+        "这类信息不太适合在公开主页上聊，我就不展开了。\n\n" +
+        "如果是招聘或合作相关，可以通过手机 17313048569 或邮箱 botao_fan@163.com 联系我，我们私下沟通。",
+    },
+    {
+      id: "advisor",
+      test: /(导师|老师|实验室|课题组|研究方向|博士|读博|直博)/,
+      answer:
+        "简历里没有写具体的导师和实验室，我不想在这里编造。\n\n" +
+        "可以确定的是我保研到浙江大学电子信息专业，感兴趣的方向是 AI Agent、具身智能和控制算法。如果你关心更具体的研究安排，可以发邮件给我，我再按实际情况回复。",
+    },
+  ];
+
+  const FALLBACK =
+    "这个问题我暂时没有更具体的公开信息，不想随便编。\n\n" +
+    "先给你一个概况：\n\n" +
+    PROFILE_SUMMARY +
+    "\n\n你也可以具体问教育背景、成绩排名、科研项目、论文专利、竞赛经历、技能工具、保研去向或联系方式。";
+
+  const chatLog = document.getElementById("chatLog");
+  const chatForm = document.getElementById("chatForm");
+  const chatInput = document.getElementById("chatInput");
+  const chatPrompts = document.getElementById("chatPrompts");
+  const sendButton = chatForm.querySelector(".send-button");
+  const resetButton = document.getElementById("resetChat");
+  const header = document.getElementById("siteHeader");
+  const sideStatusText = document.getElementById("sideStatusText");
+  const sideNoteText = document.getElementById("sideNoteText");
+  const chatSubtitle = document.getElementById("chatSubtitle");
+
+  // ---------- Fixed avatar ----------
+
+  const AVATAR_SRC = "avatar.jpg";
+
+  function paintMessageAvatar(element) {
+    if (!element) return;
+    element.textContent = "";
+    const image = document.createElement("img");
+    image.className = "msg-avatar__image";
+    image.src = AVATAR_SRC;
+    image.alt = "";
+    element.append(image);
+  }
+
+  function initFixedAvatar() {
+    document.querySelectorAll(".msg-avatar").forEach(paintMessageAvatar);
+  }
+
+  initFixedAvatar();
+
+  if (!chatLog || !chatForm || !chatInput || !chatPrompts) return;
+
+  const API_BASE = String(window.CHAT_API_BASE || "").replace(/\/+$/, "");
+  const STATUS_ENDPOINT = `${API_BASE}/api/status`;
+  const CHAT_ENDPOINT = `${API_BASE}/api/chat`;
+  const LLM_TIMEOUT_MS = 30_000;
+  const MAX_HISTORY_MESSAGES = 8;
+
+  let isReplying = false;
+  let messageCount = 0;
+  let llmMode = "local";
+  let llmModel = "";
+  let llmReady = Promise.resolve();
+  let conversationHistory = [];
+  let conversationGeneration = 0;
+  let activeRequestController = null;
+
+  const prefersReducedMotion = () =>
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function scrollToLatest() {
+    requestAnimationFrame(() => {
+      chatLog.scrollTo({
+        top: chatLog.scrollHeight,
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+      });
+    });
+  }
+
+  function createAvatar() {
+    const avatar = document.createElement("span");
+    avatar.className = "msg-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+    paintMessageAvatar(avatar);
+    return avatar;
+  }
+
+  function createMessage(role, text) {
+    messageCount += 1;
+
+    const row = document.createElement("div");
+    row.className = `message message--${role}`;
+
+    if (role === "bot") {
+      row.append(createAvatar());
+    }
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    row.append(bubble);
+
+    return row;
+  }
+
+  function addMessage(role, text) {
+    chatLog.append(createMessage(role, text));
+    scrollToLatest();
+  }
+
+  function showTyping() {
+    const row = document.createElement("div");
+    row.className = "message message--bot message--typing";
+    row.dataset.typing = "true";
+    row.setAttribute("aria-label", "数字分身正在输入");
+
+    row.append(createAvatar());
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble typing";
+    bubble.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < 3; i += 1) bubble.append(document.createElement("i"));
+
+    row.append(bubble);
+    chatLog.append(row);
+    scrollToLatest();
+  }
+
+  function removeTyping() {
+    const typing = chatLog.querySelector("[data-typing]");
+    if (typing) typing.remove();
+  }
+
+  function renderPrompts(questions) {
+    const label = document.createElement("span");
+    label.className = "prompt-label";
+    label.textContent = "快速提问数字分身";
+
+    const fragment = document.createDocumentFragment();
+    fragment.append(label);
+
+    [...new Set(questions)].slice(0, 4).forEach((question) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "prompt-chip";
+      button.dataset.question = question;
+      button.disabled = isReplying;
+      button.title = "点击直接发送";
+      button.setAttribute("aria-label", `发送问题：${question}`);
+
+      const text = document.createElement("span");
+      text.textContent = question;
+
+      const arrow = document.createElement("span");
+      arrow.className = "prompt-arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "→";
+
+      button.append(text, arrow);
+      button.addEventListener("click", () => safeSubmit(question));
+      fragment.append(button);
+    });
+
+    chatPrompts.replaceChildren(fragment);
+  }
+
+  function findIntent(text) {
+    const normalized = text.toLowerCase().trim();
+
+    if (/^(谢谢|感谢|多谢|thanks?|thank you)[啦呀啊!！,.，。\s]*$/i.test(normalized)) {
+      return {
+        id: "thanks",
+        answer: "不客气。如果还想了解我的专业背景、能力积累或未来方向，继续问我就好。",
+      };
+    }
+
+    if (/^(你好|您好|hi|hello|hey|在吗)[呀啊~～!！,.，。\s]*$/i.test(normalized)) {
+      return {
+        id: "intro",
+        answer: GREETING,
+      };
+    }
+
+    return KB.find((entry) => entry.test.test(normalized)) || null;
+  }
+
+  function setReplying(value) {
+    isReplying = value;
+    sendButton.disabled = value;
+    chatLog.setAttribute("aria-busy", String(value));
+    chatPrompts.classList.toggle("is-busy", value);
+    chatPrompts.querySelectorAll(".prompt-chip").forEach((button) => {
+      button.disabled = value;
+    });
+  }
+
+  function setChatMode(mode, note) {
+    llmMode = mode === "llm" ? "llm" : "local";
+    const isLlm = llmMode === "llm";
+
+    if (sideStatusText) {
+      sideStatusText.textContent = isLlm
+        ? "在线 · DeepSeek"
+        : "本地问答 · 基于公开信息";
+    }
+    if (chatSubtitle) {
+      chatSubtitle.textContent = isLlm
+        ? "DeepSeek · 实时生成"
+        : "本地知识库 · 即时回答";
+    }
+    if (sideNoteText) {
+      sideNoteText.textContent =
+        note ||
+        (isLlm
+          ? "回答由 DeepSeek 生成，仅依据本页公开信息。"
+          : "回答由本地知识库生成，仅覆盖本页公开信息。");
+    }
+  }
+
+  async function detectLlmMode() {
+    if (window.location.protocol === "file:") {
+      setChatMode(
+        "local",
+        "当前为本地预览；通过 start-server.bat 启动后可启用 DeepSeek。"
+      );
+      return "local";
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+
+    try {
+      const response = await fetch(STATUS_ENDPOINT, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error("status_failed");
+      const data = await response.json();
+
+      if (data && data.llm) {
+        llmModel = typeof data.model === "string" ? data.model : "deepseek-chat";
+        setChatMode("llm");
+        return "llm";
+      }
+
+      setChatMode(
+        "local",
+        data?.reason === "missing_api_key"
+          ? "未检测到 DeepSeek Key，当前使用本地知识库。"
+          : undefined
+      );
+      return "local";
+    } catch {
+      setChatMode("local");
+      return "local";
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function requestLlmAnswer() {
+    const controller = new AbortController();
+    activeRequestController = controller;
+    const timer = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: conversationHistory.slice(-MAX_HISTORY_MESSAGES),
+        }),
+        signal: controller.signal,
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "模型服务暂时不可用");
+      }
+      if (typeof data.reply !== "string" || !data.reply.trim()) {
+        throw new Error("模型返回了空内容");
+      }
+
+      return data.reply.trim();
+    } finally {
+      clearTimeout(timer);
+      if (activeRequestController === controller) {
+        activeRequestController = null;
+      }
+    }
+  }
+
+  function focusComposer() {
+    if (window.matchMedia("(pointer: fine)").matches) {
+      chatInput.focus({ preventScroll: true });
+    }
+  }
+
+  async function respondTo(text) {
+    const intent = findIntent(text);
+    const localAnswer = intent ? intent.answer : FALLBACK;
+    const followUps =
+      FOLLOW_UPS[intent ? intent.id : "fallback"] || FOLLOW_UPS.fallback;
+    const requestGeneration = conversationGeneration;
+
+    setReplying(true);
+    showTyping();
+
+    try {
+      if (llmMode === "llm") {
+        try {
+          const reply = await requestLlmAnswer();
+          if (requestGeneration !== conversationGeneration) return;
+
+          removeTyping();
+          addMessage("bot", reply);
+          conversationHistory.push({ role: "assistant", content: reply });
+          renderPrompts(followUps);
+          return;
+        } catch (error) {
+          if (requestGeneration !== conversationGeneration) return;
+
+          console.warn("[chat] DeepSeek request failed:", error.message);
+          setChatMode("local", "模型暂时不可用，已切换到本地知识库。");
+        }
+      }
+
+      const delay = 400 + Math.min(350, localAnswer.length * 0.8);
+      await sleep(delay);
+      if (requestGeneration !== conversationGeneration) return;
+
+      removeTyping();
+      addMessage("bot", localAnswer);
+      renderPrompts(followUps);
+    } finally {
+      if (requestGeneration === conversationGeneration) {
+        setReplying(false);
+        focusComposer();
+      }
+    }
+  }
+
+  async function submitQuestion(rawText) {
+    const text = String(rawText || "").trim();
+    if (!text || isReplying) return;
+
+    await llmReady;
+    if (isReplying) return;
+
+    addMessage("user", text);
+    if (llmMode === "llm") {
+      conversationHistory.push({ role: "user", content: text });
+    }
+
+    chatInput.value = "";
+    resizeComposer();
+    await respondTo(text);
+  }
+
+  function safeSubmit(rawText) {
+    submitQuestion(rawText).catch((error) => {
+      console.error("[chat]", error);
+      removeTyping();
+      setReplying(false);
+    });
+  }
+
+  function resizeComposer() {
+    chatInput.style.height = "auto";
+    chatInput.style.height = `${Math.min(chatInput.scrollHeight, 112)}px`;
+  }
+
+  function startConversation() {
+    conversationGeneration += 1;
+    if (activeRequestController) {
+      activeRequestController.abort();
+      activeRequestController = null;
+    }
+
+    conversationHistory = [];
+    removeTyping();
+    setReplying(false);
+    messageCount = 0;
+    chatLog.replaceChildren();
+    addMessage("bot", GREETING);
+    renderPrompts(INITIAL_PROMPTS);
+  }
+
+  chatForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    safeSubmit(chatInput.value);
+  });
+
+  chatInput.addEventListener("input", resizeComposer);
+
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      safeSubmit(chatInput.value);
+    }
+  });
+
+  resetButton.addEventListener("click", () => {
+    startConversation();
+    resizeComposer();
+    focusComposer();
+  });
+
+  // Header elevation on scroll
+  const updateHeader = () => {
+    if (!header) return;
+    header.classList.toggle("is-scrolled", window.scrollY > 10);
+  };
+  updateHeader();
+  window.addEventListener("scroll", updateHeader, { passive: true });
+
+  // 统一站内锚点定位：无论当前滚动到哪里，落点都一致
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const hash = link.getAttribute("href");
+      const target = document.getElementById(hash.slice(1));
+      if (!target) return;
+
+      event.preventDefault();
+
+      // 先切换到滚动后的头部状态，保证测量时页面高度不再变化
+      if (header) header.classList.add("is-scrolled");
+
+      // 目标区块若尚未展开，先立即展开，避免到达后再上移
+      const pendingReveal =
+        target.classList.contains("reveal") &&
+        !target.classList.contains("is-visible");
+      if (pendingReveal) {
+        target.style.transition = "none";
+        target.classList.add("is-visible");
+      }
+
+      const offset = (header ? header.offsetHeight : 0) + 8;
+      const top = Math.max(
+        0,
+        target.getBoundingClientRect().top + window.scrollY - offset
+      );
+
+      if (pendingReveal) {
+        window.requestAnimationFrame(() => {
+          target.style.transition = "";
+        });
+      }
+
+      window.scrollTo({
+        top,
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+      });
+
+      history.replaceState(null, "", hash);
+    });
+  });
+
+  // Reveal sections on scroll
+  const revealItems = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window && !prefersReducedMotion()) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -36px" }
+    );
+    revealItems.forEach((item) => observer.observe(item));
+  } else {
+    revealItems.forEach((item) => item.classList.add("is-visible"));
+  }
+
+  startConversation();
+  resizeComposer();
+  llmReady = detectLlmMode();
+})();
+
+
+/* ---------- Research carousel (desktop only) ---------- */
+(function () {
+  const grid = document.querySelector(".research-grid");
+  const prev = document.querySelector(".research-nav--prev");
+  const next = document.querySelector(".research-nav--next");
+  if (!grid || !prev || !next) return;
+
+  const VISIBLE = 3;
+  const FADE = 260;
+  const cards = () => Array.from(grid.children).filter((el) => el.classList.contains("research-card"));
+  let busy = false;
+
+  const refresh = () => {
+    cards().forEach((card, i) => {
+      card.classList.toggle("research-card--hidden", i >= VISIBLE);
+    });
+  };
+
+  const settle = (card) => {
+    card.classList.remove("research-card--out", "research-card--in");
+    grid.classList.remove("is-next", "is-prev");
+    busy = false;
+  };
+
+  const shift = (dir) => {
+    if (busy) return;
+    const list = cards();
+    if (list.length <= 1) return;
+    busy = true;
+    grid.classList.add(dir > 0 ? "is-next" : "is-prev");
+    const moving = dir > 0 ? grid.firstElementChild : grid.lastElementChild;
+
+    const before = new Map();
+    list.forEach((card) => before.set(card, card.getBoundingClientRect()));
+
+    moving.classList.add("research-card--out");
+    setTimeout(() => {
+      if (dir > 0) grid.appendChild(moving);
+      else grid.insertBefore(moving, grid.firstElementChild);
+
+      const stay = list.filter((card) => card !== moving);
+      stay.forEach((card) => {
+        const a = before.get(card);
+        const b = card.getBoundingClientRect();
+        const dx = a.left - b.left;
+        const dy = a.top - b.top;
+        if (!dx && !dy) return;
+        card.style.transition = "none";
+        card.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+
+      void grid.offsetWidth;
+
+      stay.forEach((card) => {
+        card.style.transition = "";
+        card.style.transform = "";
+      });
+
+      moving.classList.remove("research-card--out");
+      moving.classList.add("research-card--in");
+      refresh();
+      setTimeout(() => settle(moving), 620);
+    }, FADE);
+  };
+
+  refresh();
+  next.addEventListener("click", () => shift(1));
+  prev.addEventListener("click", () => shift(-1));
+})();
