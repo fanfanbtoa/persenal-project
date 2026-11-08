@@ -745,7 +745,7 @@
   if (!grid || !prev || !next) return;
 
   const VISIBLE = 3;
-  const FADE = 520;
+  const FADE = 260;
   const cards = () => Array.from(grid.children).filter((el) => el.classList.contains("research-card"));
   let busy = false;
 
@@ -798,7 +798,7 @@
       moving.classList.remove("research-card--out");
       moving.classList.add("research-card--in");
       refresh();
-      setTimeout(() => settle(moving), 640);
+      setTimeout(() => settle(moving), 620);
     }, FADE);
   };
 
