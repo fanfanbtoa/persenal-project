@@ -2617,14 +2617,34 @@ body {
   z-index: 0;
   overflow: hidden;
   background-color: var(--bg);
-  background-image:
-    linear-gradient(180deg, rgba(2, 14, 16, 0.46) 0%, rgba(2, 14, 16, 0.3) 38%, rgba(2, 14, 16, 0.62) 100%),
-    linear-gradient(96deg, rgba(2, 14, 16, 0.56) 0%, rgba(2, 14, 16, 0.24) 46%, rgba(2, 14, 16, 0.08) 70%, rgba(2, 14, 16, 0.42) 100%),
-    url("bg-water.jpg");
-  background-size: cover, cover, cover;
-  background-position: center, center, center 42%;
+  background-image: url("bg-water.jpg");
+  background-size: cover;
+  background-position: center 42%;
   background-repeat: no-repeat;
   pointer-events: none;
+}
+
+.page-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.page-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(180deg, rgba(2, 14, 16, 0.46) 0%, rgba(2, 14, 16, 0.3) 38%, rgba(2, 14, 16, 0.62) 100%),
+    linear-gradient(96deg, rgba(2, 14, 16, 0.56) 0%, rgba(2, 14, 16, 0.24) 46%, rgba(2, 14, 16, 0.08) 70%, rgba(2, 14, 16, 0.42) 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat;
 }
 
 .page-bg .bg-orb,
@@ -3243,10 +3263,13 @@ main {
 
 @media (max-width: 760px) {
   .page-bg {
+    background-image: url("bg-water.jpg");
+  }
+
+  .page-bg::after {
     background-image:
       linear-gradient(180deg, rgba(2, 14, 16, 0.6) 0%, rgba(2, 14, 16, 0.52) 45%, rgba(2, 14, 16, 0.72) 100%),
-      linear-gradient(96deg, rgba(2, 14, 16, 0.45) 0%, rgba(2, 14, 16, 0.22) 55%, rgba(2, 14, 16, 0.45) 100%),
-      url("bg-water.jpg");
+      linear-gradient(96deg, rgba(2, 14, 16, 0.45) 0%, rgba(2, 14, 16, 0.22) 55%, rgba(2, 14, 16, 0.45) 100%);
   }
 
   .hero-facts::before {
@@ -3603,5 +3626,13 @@ main {
 
   .research-card__title {
     font-size: 19px;
+  }
+}
+
+
+/* Video background: respect reduced motion, keep poster fallback */
+@media (prefers-reduced-motion: reduce) {
+  .page-bg-video {
+    display: none;
   }
 }
