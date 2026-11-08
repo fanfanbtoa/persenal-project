@@ -3630,9 +3630,9 @@ main {
 }
 
 
-/* Video background: respect reduced motion, keep poster fallback */
+/* Video background: keep video visible even when reduce motion is on */
 @media (prefers-reduced-motion: reduce) {
   .page-bg-video {
-    display: none;
+    display: block;
   }
 }
