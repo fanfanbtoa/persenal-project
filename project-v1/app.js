@@ -692,7 +692,7 @@
         target.classList.add("is-visible");
       }
 
-      const offset = (header ? header.offsetHeight : 0) + 18;
+      const offset = (header ? header.offsetHeight : 0) + 8;
       const top = Math.max(
         0,
         target.getBoundingClientRect().top + window.scrollY - offset
