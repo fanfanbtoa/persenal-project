@@ -4002,6 +4002,15 @@ p, dd, li {
 .hero-detail p {
   font-size: 11px;
   line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.hero-detail ul {
+  min-height: 4.9em;
+}
+
+.hero-detail p + p {
+  margin-top: 2px;
 }
 
 .hero-facts {
