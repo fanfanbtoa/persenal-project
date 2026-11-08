@@ -671,6 +671,48 @@
   updateHeader();
   window.addEventListener("scroll", updateHeader, { passive: true });
 
+  // 统一站内锚点定位：无论当前滚动到哪里，落点都一致
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const hash = link.getAttribute("href");
+      const target = document.getElementById(hash.slice(1));
+      if (!target) return;
+
+      event.preventDefault();
+
+      // 先切换到滚动后的头部状态，保证测量时页面高度不再变化
+      if (header) header.classList.add("is-scrolled");
+
+      // 目标区块若尚未展开，先立即展开，避免到达后再上移
+      const pendingReveal =
+        target.classList.contains("reveal") &&
+        !target.classList.contains("is-visible");
+      if (pendingReveal) {
+        target.style.transition = "none";
+        target.classList.add("is-visible");
+      }
+
+      const offset = (header ? header.offsetHeight : 0) + 18;
+      const top = Math.max(
+        0,
+        target.getBoundingClientRect().top + window.scrollY - offset
+      );
+
+      if (pendingReveal) {
+        window.requestAnimationFrame(() => {
+          target.style.transition = "";
+        });
+      }
+
+      window.scrollTo({
+        top,
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+      });
+
+      history.replaceState(null, "", hash);
+    });
+  });
+
   // Reveal sections on scroll
   const revealItems = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && !prefersReducedMotion()) {
