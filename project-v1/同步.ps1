@@ -1,4 +1,4 @@
-param([string]$Description = "")
+﻿param([string]$Description = "")
 $ErrorActionPreference = 'Stop'
 $c = 'C:\Users\FBT2005\Desktop\我的项目'
 if (-not $Description) { $Description = Read-Host '这次改了什么' }

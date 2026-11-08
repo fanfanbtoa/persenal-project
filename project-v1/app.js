@@ -693,3 +693,74 @@
   resizeComposer();
   llmReady = detectLlmMode();
 })();
+
+
+/* ---------- Research carousel (desktop only) ---------- */
+(function () {
+  const grid = document.querySelector(".research-grid");
+  const prev = document.querySelector(".research-nav--prev");
+  const next = document.querySelector(".research-nav--next");
+  if (!grid || !prev || !next) return;
+
+  const VISIBLE = 3;
+  const FADE = 520;
+  const cards = () => Array.from(grid.children).filter((el) => el.classList.contains("research-card"));
+  let busy = false;
+
+  const refresh = () => {
+    cards().forEach((card, i) => {
+      card.classList.toggle("research-card--hidden", i >= VISIBLE);
+    });
+  };
+
+  const settle = (card) => {
+    card.classList.remove("research-card--out", "research-card--in");
+    grid.classList.remove("is-next", "is-prev");
+    busy = false;
+  };
+
+  const shift = (dir) => {
+    if (busy) return;
+    const list = cards();
+    if (list.length <= 1) return;
+    busy = true;
+    grid.classList.add(dir > 0 ? "is-next" : "is-prev");
+    const moving = dir > 0 ? grid.firstElementChild : grid.lastElementChild;
+
+    const before = new Map();
+    list.forEach((card) => before.set(card, card.getBoundingClientRect()));
+
+    moving.classList.add("research-card--out");
+    setTimeout(() => {
+      if (dir > 0) grid.appendChild(moving);
+      else grid.insertBefore(moving, grid.firstElementChild);
+
+      const stay = list.filter((card) => card !== moving);
+      stay.forEach((card) => {
+        const a = before.get(card);
+        const b = card.getBoundingClientRect();
+        const dx = a.left - b.left;
+        const dy = a.top - b.top;
+        if (!dx && !dy) return;
+        card.style.transition = "none";
+        card.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+
+      void grid.offsetWidth;
+
+      stay.forEach((card) => {
+        card.style.transition = "";
+        card.style.transform = "";
+      });
+
+      moving.classList.remove("research-card--out");
+      moving.classList.add("research-card--in");
+      refresh();
+      setTimeout(() => settle(moving), 640);
+    }, FADE);
+  };
+
+  refresh();
+  next.addEventListener("click", () => shift(1));
+  prev.addEventListener("click", () => shift(-1));
+})();
