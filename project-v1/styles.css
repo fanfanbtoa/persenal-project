@@ -3263,7 +3263,8 @@ main {
 
 @media (max-width: 760px) {
   .page-bg {
-    background-image: url("bg-water.jpg");
+    background-image: url("bg-mobile.jpg");
+    background-position: center;
   }
 
   .page-bg::after {
